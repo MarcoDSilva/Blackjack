@@ -7,7 +7,7 @@ namespace BlackJack
     class Deck
     {
         private short numberOfCards = 0;
-
+            
         private List<Card> deckOfCards = null;
 
         public Deck()
@@ -41,6 +41,11 @@ namespace BlackJack
         public List<Card> GetDeck()
         {
             return this.deckOfCards;
+        }
+
+        public int GetCardCount()
+        {
+            return deckOfCards.Count;
         }
 
         /// <summary>
