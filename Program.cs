@@ -12,48 +12,6 @@ namespace BlackJack
             gameControl.FillDeck();
 
             GamePresentation(gameControl.GetPlayer(), gameControl);
-
-            //foreach (Card c in gameControl.GetDeckList().GetDeck())
-            //{
-            //    if (c.GetSuit().Equals("Diamonds") || c.GetSuit().Equals("Hearts"))
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Red;
-            //    }
-            //    else if (c.GetSuit().Equals("Clubs"))
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Green;
-            //    }
-            //    else
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //    }
-            //    Console.WriteLine($"Value : {c.GetCardValue().PadRight(10)} Suit: {c.GetSuit().PadRight(10)}");
-            //}
-
-
-            // ===== RANDOM TO GEN THE CARDS ======
-            //Random rng = new Random();
-
-
-            //Card toSpit = deck.GetDeck()[rng.Next(1, 53)];
-
-            //if (!toSpit.Equals(null))
-            //{
-            //    Console.WriteLine($"Carta: {toSpit.GetCardValue()}, Naipe: {toSpit.GetSuit()}");
-
-            //}
-            //Console.ForegroundColor = ConsoleColor.White;
-
-            //for (int i = 0; i < deck.GetDeck().Count; i++)
-            //{
-            //    Card test = deck.GetDeck()[i];
-
-            //    if(test.GetSuit().Equals("Diamonds") && test.GetCardValue().Equals("A"))
-            //    {
-            //        Console.WriteLine($"Carta encontrada na iteração: {i}");
-            //    } 
-            //}
-
         }
 
 
@@ -89,29 +47,48 @@ namespace BlackJack
                 Console.WriteLine("Thank you for not playing!");
                 //method to finish
             }
-
         }
 
         public static void GameStart(GameManagement game)
         {
 
-            List<Card> playerCards = new List<Card>();
+            //List<Card> playerCards = new List<Card>();
+            Hand playerHand = new Hand();
+            Hand dealerHand = new Hand();
 
-            bool start = true;            
+            bool start = true;
             ConsoleKey answer;
 
 
             //GameLogic();
-            Console.WriteLine("Your 2 cards are: ");
-            playerCards.Add(game.GetCard());
-            playerCards.Add(game.GetCard());
+            Console.WriteLine("Dealer Limit is 18\nYour 2 cards are: ");
+            playerHand.AddCard(game.GetCard());
+            playerHand.AddCard(game.GetCard());
 
-            Console.WriteLine($"Value : {playerCards[0].GetCardValue().PadRight(10)} Suit: {playerCards[0].GetSuit().PadRight(10)}");
-            Console.WriteLine($"Value : {playerCards[1].GetCardValue().PadRight(10)} Suit: {playerCards[1].GetSuit().PadRight(10)}");
-            Console.WriteLine($"Hand value: {GetValue(playerCards)}");
+            //color for the foreground to match the card types and printing it
+            Console.ForegroundColor = GetForeColor(playerHand.GetCard(0));
+            Console.WriteLine($"Value : {playerHand.GetCard(0).GetCardValue().PadRight(10)} Suit: {playerHand.GetCard(0).GetSuit().PadRight(10)}");
+
+            Console.ForegroundColor = GetForeColor(playerHand.GetCard(1));
+            Console.WriteLine($"Value : {playerHand.GetCard(1).GetCardValue().PadRight(10)} Suit: {playerHand.GetCard(1).GetSuit().PadRight(10)}");
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($"Hand value: {GetValue(playerHand.GetHand())}");
+            
+            //DEALER TEST
+            Console.WriteLine("Dealer Has: ");          
+            dealerHand.AddCard(game.GetCard());
+
+            //color for the foreground to match the card types and printing it
+            Console.ForegroundColor = GetForeColor(dealerHand.GetCard(0));              
+            Console.WriteLine($"Value : {dealerHand.GetCard(0).GetCardValue().PadRight(10)} Suit: {dealerHand.GetCard(0).GetSuit().PadRight(10)}");
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine($"Dealer Hand value: {GetValue(dealerHand.GetHand())}");
+
             Console.WriteLine("Do you want more cards? \nH for hit, S to stop, Esc to end");
 
-            //loop to 
+            //game loop
             while (start)
             {
                 do
@@ -120,57 +97,67 @@ namespace BlackJack
 
                 } while (!answer.Equals(ConsoleKey.H) && !answer.Equals(ConsoleKey.Escape) && !answer.Equals(ConsoleKey.S));
 
+                //conditional for the Hit key and the respective values
                 if (answer.Equals(ConsoleKey.H))
                 {
-                    playerCards.Add(game.GetCard());
-                    Console.WriteLine($"Value : {playerCards[playerCards.Count - 1].GetCardValue().PadRight(10)}" +
-                        $" Suit: {playerCards[playerCards.Count - 1].GetSuit().PadRight(10)}");
+                    playerHand.AddCard(game.GetCard());
 
-                   
+                    Console.ForegroundColor = GetForeColor(playerHand.GetCard(playerHand.GetHandSize() - 1));
 
-                    if(GetValue(playerCards) <= 21)
+                    Console.WriteLine($"Value : {playerHand.GetCard(playerHand.GetHandSize() - 1).GetCardValue().PadRight(10)}" +
+                        $" Suit: {playerHand.GetCard(playerHand.GetHandSize() - 1).GetSuit().PadRight(10)}");
+
+
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    if (GetValue(playerHand.GetHand()) < 21)
                     {
-                        Console.WriteLine($"Hand value: {GetValue(playerCards)}");
-                    } else
-                    {
-                        Console.WriteLine($"You blew up with: {GetValue(playerCards)}");
+                        Console.WriteLine($"Hand value: {GetValue(playerHand.GetHand())}");
                     }
-
+                    else if (GetValue(playerHand.GetHand()) == 21 && playerHand.GetHandSize() > 2)
+                    {
+                        Console.Write("Hand value is 21! Maximum Value!");
+                    }
+                    else if (GetValue(playerHand.GetHand()) == 21 && playerHand.GetHandSize() == 2)
+                    {
+                        Console.Write("Hand value is 21! Blackjack!");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"You blew up with: {GetValue(playerHand.GetHand())}");
+                        start = false;
+                    }
                 }
-                else if (answer.Equals(ConsoleKey.Escape) || answer.Equals(ConsoleKey.S))
+                else if (answer.Equals(ConsoleKey.S)) //player turn ended, activate dealer turn
+                {
+                    Console.WriteLine("Dealer turn.");
+                }
+                else if (answer.Equals(ConsoleKey.Escape)) //gameEnd
                 {
                     Console.WriteLine("Thank you for not playing!");
                     start = false;
                 }
-
             }
-            //foreach (Card c in gameControl.GetDeckList().GetDeck())
-            //{
-            //    if (c.GetSuit().Equals("Diamonds") || c.GetSuit().Equals("Hearts"))
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Red;
-            //    }
-            //    else if (c.GetSuit().Equals("Clubs"))
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.Green;
-            //    }
-            //    else
-            //    {
-            //        Console.ForegroundColor = ConsoleColor.White;
-            //    }
-            //    Console.WriteLine($"Value : {c.GetCardValue().PadRight(10)} Suit: {c.GetSuit().PadRight(10)}");
-            //}
 
         }
 
+        /// <summary>
+        /// Used to get the hand value numerically
+        /// </summary>
+        /// <param name="cards"></param>
+        /// <returns></returns>
         public static int GetValue(List<Card> cards)
         {
             int value = 0;
-            int outrino = 0;
+            int outValue = 0;
             int valueConverted;
+
+            //we loop to get the value from the cards (values are string)
+            //so we parse the ones we can extract an integer number 2 to 10 and use those
+            //if it's a figure we verify Aces to get the right value and all others get the value 10
             foreach (Card c in cards)
             {
-                if (int.TryParse(c.GetCardValue(), out outrino))
+                if (int.TryParse(c.GetCardValue(), out outValue))
                 {
                     valueConverted = Convert.ToInt32(c.GetCardValue());
 
@@ -192,6 +179,8 @@ namespace BlackJack
                 }
             }
 
+            //we verify the total cards in the hand, if there is an Ace and the total hand value is higher than 10 (ex: a figure)
+            //the aces drop to value 1
             foreach (Card c in cards)
             {
                 if (value >= 11 && c.GetCardValue().Equals("A"))
@@ -202,31 +191,53 @@ namespace BlackJack
             return value;
         }
 
-        //public static void GameLogic()
-        //{
-        //    PlayerPlays();
-        //    DealerPlays();
-        //}
-
-        //public static void PlayerPlays()
-        //{
-
-        //}
-
-        //public static void DealerPlays()
-        //{
-
-        //}
-
-        //public static void GameResult()
-        //{
-
-        //}
-
-        //public static void Updates()
-        //{
-
-        //}
+        public static ConsoleColor GetForeColor(Card card)
+        {
+            if (card.GetSuit().Equals("Hearts"))
+            {
+                return ConsoleColor.Red;
+            }
+            else if (card.GetSuit().Equals("Clubs"))
+            {
+                return ConsoleColor.Green;
+            }
+            else if (card.GetSuit().Equals("Spades"))
+            {
+                return ConsoleColor.White;
+            }
+            else
+            {
+                return ConsoleColor.Blue;
+            }
+        }
 
     }
+
+    //public static void GameLogic()
+    //{
+    //    PlayerPlays();
+    //    DealerPlays();
+    //}
+
+    //public static void PlayerPlays()
+    //{
+
+    //}
+
+    //public static void DealerPlays()
+    //{
+
+    //}
+
+    //public static void GameResult()
+    //{
+
+    //}
+
+    //public static void Updates()
+    //{
+
+    //}
+
 }
+

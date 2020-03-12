@@ -20,7 +20,7 @@ namespace BlackJack
 
         public void FillDeck()
         {
-            for(int i = 0; i < numberOfDecks; i++)
+            for (int i = 0; i < numberOfDecks; i++)
             {
                 deck.Fill("Diamonds", deck);
                 deck.Fill("Spades", deck);
@@ -46,7 +46,7 @@ namespace BlackJack
         {
             numberOfDecks = num;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
